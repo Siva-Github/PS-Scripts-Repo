@@ -17,7 +17,7 @@ Return $LocalTime
 
 $datescope = (get-date).AddHours(-3).ToUniversalTime()
 $datescope = get-date($datescope) -Format s
-$filename = "SSH-SessionActivitySummariesByMinute-" + (get-date ($datescope) -f "MM-yyyy") + ".csv"
+$filename = "SessionActivitySummariesByMinute-" + (get-date ($datescope) -f "MM-yyyy") + ".csv"
 $uri = "http://localhost/Citrix/Monitor/OData/v3/Data/SessionActivitySummaries()?`$filter=Granularity eq 1 and SummaryDate gt DateTime`'$datescope`' &`$select=DesktopGroup/Name,SummaryDate,ConcurrentSessionCount,ConnectedSessionCount,DisconnectedSessionCount&`$orderby=SummaryDate asc&`$expand=DesktopGroup&`$format=json"
 $records = Invoke-RestMethod -Uri $uri -UseDefaultCredentials
 $records.value | Select-Object @{Name='SummaryDateEST';Expression={Get-LocalTime($_.SummaryDate)}},ConcurrentSessionCount,ConnectedSessionCount,DisconnectedSessionCount,@{Name='DesktopGroupName';Expression={$_.DesktopGroup.Name}} | Export-csv .\$filename -NoTypeInformation -Append
